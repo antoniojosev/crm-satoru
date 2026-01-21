@@ -24,6 +24,7 @@ interface RegisterData {
   fullName: string;
   email: string;
   password: string;
+  role: string;
 }
 
 export default function RegisterPage() {
@@ -33,6 +34,7 @@ export default function RegisterPage() {
     fullName: "",
     email: "",
     password: "",
+    role: "ADMIN", // Users registered from admin panel are ADMIN by default
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
