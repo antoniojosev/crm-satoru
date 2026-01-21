@@ -1,7 +1,7 @@
 import { IAuthRepository } from "../../domain/repositories/IAuthRepository";
 import { User } from "../../domain/entities/User";
 import { LoginCredentials } from "../dtos/LoginDTO";
-import { RegisterDTO } from "../dtos/RegisterDTO";
+import { RegisterDTO } from "../dtos/RegisterDto";
 import { apiRequest } from "../../../lib/axios";
 
 export class AuthRepositoryImpl implements IAuthRepository {

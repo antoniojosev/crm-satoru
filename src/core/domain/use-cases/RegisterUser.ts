@@ -1,5 +1,5 @@
 import { IAuthRepository } from "../repositories/IAuthRepository";
-import { RegisterDTO } from "../../data/dtos/RegisterDTO";
+import { RegisterDTO } from "../../data/dtos/RegisterDto";
 import { User } from "../entities/User";
 
 export class RegisterUser {
