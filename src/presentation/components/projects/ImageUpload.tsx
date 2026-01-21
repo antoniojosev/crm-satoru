@@ -3,6 +3,7 @@
 import React, { useCallback, useState } from "react";
 import { Upload, X, Image as ImageIcon, Loader2 } from "lucide-react";
 import { apiRequest } from "@/lib/axios";
+import { getImageUrl } from "@/lib/image-url";
 
 interface ImageUploadProps {
   projectId: string;
@@ -131,13 +132,6 @@ export default function ImageUpload({
     e.target.value = "";
   };
 
-  const getImageFullUrl = (imageUrl: string) => {
-    if (imageUrl.startsWith("http")) return imageUrl;
-    // Remove /api from the URL since static files are served from root
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:3000';
-    return `${baseUrl}${imageUrl}`;
-  };
-
   return (
     <div className="space-y-4">
       {/* Upload Area */}
@@ -203,7 +197,7 @@ export default function ImageUpload({
               className="relative group aspect-square rounded-xl overflow-hidden bg-[#0A0A0A] border border-gray-800"
             >
               <img
-                src={getImageFullUrl(imageUrl)}
+                src={getImageUrl(imageUrl)}
                 alt={`Imagen ${index + 1}`}
                 className="w-full h-full object-cover"
               />

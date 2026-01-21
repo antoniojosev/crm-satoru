@@ -28,6 +28,7 @@ import {
   clearCurrentInvestor,
 } from "@/store/slices/investorsSlice";
 import type { KycStatus } from "@/store/types";
+import { getImageUrl } from "@/lib/image-url";
 
 export default function InvestorDetailPage({
   params,
@@ -122,15 +123,6 @@ export default function InvestorDetailPage({
       default:
         return null;
     }
-  };
-
-  // Helper function to construct full URL for KYC images
-  const getKycImageUrl = (url: string | undefined): string => {
-    if (!url) return '';
-    if (url.startsWith("http")) return url;
-    // Remove /api from base URL since static files are served from root
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:3000';
-    return `${baseUrl}${url}`;
   };
 
   if (isLoading) {
@@ -373,16 +365,16 @@ export default function InvestorDetailPage({
                   </p>
                   <div className='w-full h-64 bg-black rounded-xl border-2 border-gray-800 overflow-hidden relative group'>
                     <img
-                      src={getKycImageUrl(investor.kycData.documentFrontUrl)}
+                      src={getImageUrl(investor.kycData.documentFrontUrl)}
                       alt='Documento frente'
                       className='w-full h-full object-contain'
                       onError={(e) => {
-                        console.error('Error loading documentFront:', getKycImageUrl(investor.kycData!.documentFrontUrl));
+                        console.error('Error loading documentFront:', getImageUrl(investor.kycData!.documentFrontUrl));
                         e.currentTarget.src = '/placeholder.png';
                       }}
                     />
                     <a
-                      href={getKycImageUrl(investor.kycData.documentFrontUrl)}
+                      href={getImageUrl(investor.kycData.documentFrontUrl)}
                       target='_blank'
                       rel='noopener noreferrer'
                       className='absolute top-2 right-2 bg-black/80 text-white p-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity'
@@ -401,16 +393,16 @@ export default function InvestorDetailPage({
                   </p>
                   <div className='w-full h-64 bg-black rounded-xl border-2 border-gray-800 overflow-hidden relative group'>
                     <img
-                      src={getKycImageUrl(investor.kycData.documentBackUrl)}
+                      src={getImageUrl(investor.kycData.documentBackUrl)}
                       alt='Documento dorso'
                       className='w-full h-full object-contain'
                       onError={(e) => {
-                        console.error('Error loading documentBack:', getKycImageUrl(investor.kycData!.documentBackUrl));
+                        console.error('Error loading documentBack:', getImageUrl(investor.kycData!.documentBackUrl));
                         e.currentTarget.src = '/placeholder.png';
                       }}
                     />
                     <a
-                      href={getKycImageUrl(investor.kycData.documentBackUrl)}
+                      href={getImageUrl(investor.kycData.documentBackUrl)}
                       target='_blank'
                       rel='noopener noreferrer'
                       className='absolute top-2 right-2 bg-black/80 text-white p-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity'
@@ -429,16 +421,16 @@ export default function InvestorDetailPage({
                   </p>
                   <div className='w-full h-64 bg-black rounded-xl border-2 border-gray-800 overflow-hidden relative group'>
                     <img
-                      src={getKycImageUrl(investor.kycData.selfieUrl)}
+                      src={getImageUrl(investor.kycData.selfieUrl)}
                       alt='Selfie'
                       className='w-full h-full object-contain'
                       onError={(e) => {
-                        console.error('Error loading selfie:', getKycImageUrl(investor.kycData!.selfieUrl));
+                        console.error('Error loading selfie:', getImageUrl(investor.kycData!.selfieUrl));
                         e.currentTarget.src = '/placeholder.png';
                       }}
                     />
                     <a
-                      href={getKycImageUrl(investor.kycData.selfieUrl)}
+                      href={getImageUrl(investor.kycData.selfieUrl)}
                       target='_blank'
                       rel='noopener noreferrer'
                       className='absolute top-2 right-2 bg-black/80 text-white p-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity'

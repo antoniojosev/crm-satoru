@@ -21,6 +21,7 @@ import {
   clearCurrentProject,
 } from "@/store/slices/projectsSlice";
 import ProjectStatusBadge from "@/presentation/components/projects/ProjectStatusBadge";
+import { getImageUrl } from "@/lib/image-url";
 
 export default function ProjectDetailPage({
   params,
@@ -42,13 +43,6 @@ export default function ProjectDetailPage({
       dispatch(clearCurrentProject());
     };
   }, [dispatch, id]);
-
-  const getImageFullUrl = (imageUrl: string) => {
-    if (imageUrl.startsWith("http")) return imageUrl;
-    // Remove /api from the URL since static files are served from root
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:3000';
-    return `${baseUrl}${imageUrl}`;
-  };
 
   if (isLoading) {
     return (
@@ -139,7 +133,7 @@ export default function ProjectDetailPage({
                     className="relative aspect-square rounded-xl overflow-hidden bg-[#0A0A0A] border border-gray-800 cursor-pointer hover:border-[#FF4400] transition-all group"
                   >
                     <img
-                      src={getImageFullUrl(imageUrl)}
+                      src={getImageUrl(imageUrl)}
                       alt={`${project.name} - Imagen ${index + 1}`}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
@@ -371,7 +365,7 @@ export default function ProjectDetailPage({
             <X size={24} />
           </button>
           <img
-            src={getImageFullUrl(selectedImage)}
+            src={getImageUrl(selectedImage)}
             alt="Vista ampliada"
             className="max-w-full max-h-full object-contain rounded-xl"
             onClick={(e) => e.stopPropagation()}
