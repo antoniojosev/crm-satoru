@@ -40,7 +40,7 @@ export default function ImageUpload({
       formData.append("image", file);
 
       try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/v1';
         console.log('Uploading image to:', `${apiUrl}/projects/${projectId}/images/upload`);
 
         const response = await fetch(
@@ -110,7 +110,7 @@ export default function ImageUpload({
     console.log('Deleting image:', { imageUrl, filename });
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/v1';
       const response = await fetch(
         `${apiUrl}/projects/${projectId}/images/${filename}`,
         {

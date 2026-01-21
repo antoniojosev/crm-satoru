@@ -8,7 +8,7 @@ export const STORAGE_KEYS = {
 } as const;
 
 // API URL from environment
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api/v1";
 
 export const satoruApi = axios.create({
   baseURL: API_URL,

@@ -90,7 +90,7 @@ export default function CreateProjectPage() {
 
       try {
         const token = localStorage.getItem("satoru_admin_token");
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/v1';
         await fetch(
           `${apiUrl}/projects/${projectId}/images/upload`,
           {

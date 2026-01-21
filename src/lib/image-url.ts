@@ -13,7 +13,7 @@ export function getImageUrl(imageUrl: string | undefined): string {
   }
 
   // Get the API URL from environment
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/v1';
 
   // Extract base URL by removing all API-related paths
   // This handles: /api/v1, /api, /v1, or any combination
