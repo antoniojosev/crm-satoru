@@ -1,14 +1,20 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  async rewrites() {
-    return [
+  images: {
+    remotePatterns: [
       {
-        source: "/api/v1/:path*", // Cuando el frontend pida /api/v1...
-        destination: "https://inmobiliaria-web3.onrender.com/api/v1/:path*", // Next.js lo manda aquí
+        protocol: "http",
+        hostname: "localhost",
+        port: "3000",
+        pathname: "/uploads/**",
       },
-    ];
+      {
+        protocol: "https",
+        hostname: "inmobiliaria-web3.onrender.com",
+        pathname: "/uploads/**",
+      },
+    ],
   },
 };
 

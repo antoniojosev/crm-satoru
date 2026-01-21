@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { StoreProvider } from "@/store/Provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,14 +17,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='es'>
-      {/* 1. suppressHydrationWarning: Evita el error de tu extensión "Smart Converter".
-        2. bg-background: Pone el fondo negro de Satoru.
-      */}
       <body
         suppressHydrationWarning={true}
         className={`${inter.className} bg-background text-text-main antialiased`}
       >
-        {children}
+        <StoreProvider>{children}</StoreProvider>
       </body>
     </html>
   );

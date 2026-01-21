@@ -1,41 +1,123 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import {
   TrendingUp,
   Users,
   Building2,
-  ArrowUpRight,
   DollarSign,
+  Loader2,
+  AlertCircle,
+  ShieldCheck,
+  Clock,
 } from "lucide-react";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { fetchDashboardStats } from "@/store/slices/dashboardSlice";
 
 export default function DashboardPage() {
-  // Estos datos vendrán del endpoint /dashboard/stats más adelante.
-  // Por ahora los dejamos fijos (hardcoded) para maquetar la Fase 1.
-  const stats = [
+  const dispatch = useAppDispatch();
+  const { stats, isLoading, error, lastUpdated } = useAppSelector(
+    (state) => state.dashboard
+  );
+
+  useEffect(() => {
+    dispatch(fetchDashboardStats());
+  }, [dispatch]);
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat("es-AR", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 0,
+    }).format(amount);
+  };
+
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return "N/A";
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat("es-ES", {
+      day: "numeric",
+      month: "short",
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(date);
+  };
+
+  if (isLoading) {
+    return (
+      <div className='flex items-center justify-center min-h-[60vh]'>
+        <Loader2 className='animate-spin text-[#FF4400]' size={48} />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className='max-w-2xl mx-auto mt-12'>
+        <div className='bg-red-500/10 border border-red-500/20 rounded-xl p-6 flex items-start gap-4'>
+          <AlertCircle className='text-red-500 flex-shrink-0' size={24} />
+          <div>
+            <h3 className='text-red-500 font-bold mb-1'>
+              Error al cargar estadísticas
+            </h3>
+            <p className='text-red-400 text-sm'>{error}</p>
+            <button
+              onClick={() => dispatch(fetchDashboardStats())}
+              className='mt-4 px-4 py-2 bg-red-500 text-white rounded-lg text-sm font-medium hover:bg-red-600 transition-colors'
+            >
+              Reintentar
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!stats) {
+    return (
+      <div className='flex items-center justify-center min-h-[60vh]'>
+        <div className='text-center'>
+          <AlertCircle className='text-gray-600 mx-auto mb-4' size={48} />
+          <p className='text-gray-500'>No hay estadísticas disponibles</p>
+        </div>
+      </div>
+    );
+  }
+
+  const statsCards = [
     {
       label: "Capital Recaudado",
-      value: "$ 450,000",
-      subtext: "+12.5% este mes",
+      value: formatCurrency(stats.totalRaised),
+      count: stats.totalRaised,
       icon: DollarSign,
       color: "text-green-500",
-      trend: "up",
+      bgColor: "bg-green-500/10",
     },
     {
-      label: "Inversores Activos",
-      value: "1,240",
-      subtext: "+18 nuevos hoy",
+      label: "Total de Inversores",
+      value: stats.totalInvestors.toString(),
+      count: stats.activeInvestors,
+      subtext: `${stats.activeInvestors} activos`,
       icon: Users,
       color: "text-orange-500",
-      trend: "up",
+      bgColor: "bg-orange-500/10",
     },
     {
-      label: "Proyectos en Curso",
-      value: "8",
-      subtext: "2 finalizan pronto",
+      label: "Proyectos",
+      value: stats.totalProjects.toString(),
+      count: stats.activeProjects,
+      subtext: `${stats.activeProjects} activos`,
       icon: Building2,
       color: "text-blue-500",
-      trend: "neutral",
+      bgColor: "bg-blue-500/10",
+    },
+    {
+      label: "KYC Pendientes",
+      value: stats.pendingKyc.toString(),
+      count: stats.pendingKyc,
+      icon: ShieldCheck,
+      color: "text-yellow-500",
+      bgColor: "bg-yellow-500/10",
     },
   ];
 
@@ -55,13 +137,13 @@ export default function DashboardPage() {
           <p className='text-xs text-gray-600 uppercase tracking-widest font-semibold'>
             Última actualización
           </p>
-          <p className='text-sm text-gray-400'>Hoy, 16:45 PM</p>
+          <p className='text-sm text-gray-400'>{formatDate(lastUpdated)}</p>
         </div>
       </div>
 
       {/* 2. Tarjetas de Estadísticas (Stats Cards) */}
-      <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
-        {stats.map((stat, index) => {
+      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'>
+        {statsCards.map((stat, index) => {
           const Icon = stat.icon;
           return (
             <div
@@ -72,14 +154,12 @@ export default function DashboardPage() {
               <div className='absolute top-0 right-0 w-24 h-24 bg-orange-500/5 rounded-full blur-2xl -mr-10 -mt-10 group-hover:bg-orange-500/10 transition-all'></div>
 
               <div className='flex justify-between items-start mb-4 relative z-10'>
-                <div
-                  className={`p-3 rounded-xl bg-gray-900 border border-gray-800 group-hover:border-gray-700 transition-colors`}
-                >
+                <div className='p-3 rounded-xl bg-gray-900 border border-gray-800 group-hover:border-gray-700 transition-colors'>
                   <Icon size={24} className={stat.color} />
                 </div>
-                {stat.trend === "up" && (
-                  <span className='flex items-center text-[10px] font-bold text-green-500 bg-green-500/10 px-2 py-1 rounded-full'>
-                    <TrendingUp size={12} className='mr-1' /> {stat.subtext}
+                {stat.subtext && (
+                  <span className='flex items-center text-[10px] font-bold text-gray-400 bg-gray-800/50 px-2 py-1 rounded-full'>
+                    {stat.subtext}
                   </span>
                 )}
               </div>
@@ -97,20 +177,73 @@ export default function DashboardPage() {
         })}
       </div>
 
-      {/* 3. Sección de Actividad Reciente (Placeholder) */}
-      <div className='bg-[#1A1A1A] border border-gray-800 rounded-2xl p-8 flex flex-col items-center justify-center text-center min-h-[300px]'>
-        <div className='w-16 h-16 bg-gray-900 rounded-full flex items-center justify-center mb-4 text-gray-700'>
-          <TrendingUp size={32} />
+      {/* 3. Sección de Estadísticas Adicionales */}
+      <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+        {/* Total Invertido */}
+        <div className='bg-[#1A1A1A] border border-gray-800 rounded-2xl p-6'>
+          <div className='flex items-center gap-3 mb-4'>
+            <div className='p-3 rounded-xl bg-gray-900 border border-gray-800'>
+              <TrendingUp className='text-green-500' size={24} />
+            </div>
+            <div>
+              <h3 className='text-sm font-bold text-gray-500 uppercase tracking-widest'>
+                Total Invertido
+              </h3>
+              <p className='text-2xl font-bold text-white'>
+                {formatCurrency(stats.totalInvested)}
+              </p>
+            </div>
+          </div>
+          <div className='pt-4 border-t border-gray-800'>
+            <div className='flex justify-between text-sm'>
+              <span className='text-gray-500'>Capital Recaudado</span>
+              <span className='text-white font-medium'>
+                {formatCurrency(stats.totalRaised)}
+              </span>
+            </div>
+          </div>
         </div>
-        <h3 className='text-xl font-bold text-white mb-2'>
-          Sin actividad reciente
-        </h3>
-        <p className='text-gray-500 max-w-sm mb-6 text-sm'>
-          Aún no se han registrado nuevas inversiones o movimientos importantes
-          en la plataforma el día de hoy.
-        </p>
-        <button className='px-6 py-3 bg-gray-800 hover:bg-gray-700 text-white rounded-xl text-sm font-medium transition-colors border border-gray-700'>
-          Ver reporte detallado
+
+        {/* KYC y Estado */}
+        <div className='bg-[#1A1A1A] border border-gray-800 rounded-2xl p-6'>
+          <div className='flex items-center gap-3 mb-4'>
+            <div className='p-3 rounded-xl bg-gray-900 border border-gray-800'>
+              <Clock className='text-yellow-500' size={24} />
+            </div>
+            <div>
+              <h3 className='text-sm font-bold text-gray-500 uppercase tracking-widest'>
+                Estado del Sistema
+              </h3>
+              <p className='text-2xl font-bold text-white'>
+                {stats.pendingKyc} Pendientes
+              </p>
+            </div>
+          </div>
+          <div className='pt-4 border-t border-gray-800 space-y-2'>
+            <div className='flex justify-between text-sm'>
+              <span className='text-gray-500'>Inversores Activos</span>
+              <span className='text-green-400 font-medium'>
+                {stats.activeInvestors}
+              </span>
+            </div>
+            <div className='flex justify-between text-sm'>
+              <span className='text-gray-500'>Proyectos Activos</span>
+              <span className='text-blue-400 font-medium'>
+                {stats.activeProjects}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 4. Botón de actualización */}
+      <div className='flex justify-center'>
+        <button
+          onClick={() => dispatch(fetchDashboardStats())}
+          className='px-6 py-3 bg-gray-800 hover:bg-gray-700 text-white rounded-xl text-sm font-medium transition-colors border border-gray-700 flex items-center gap-2'
+        >
+          <TrendingUp size={16} />
+          Actualizar estadísticas
         </button>
       </div>
     </div>

@@ -5,29 +5,30 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
 import { Eye, EyeOff, Mail, Lock, ArrowRight, Loader2 } from "lucide-react";
-import { AuthRepositoryImpl } from "@/core/data/repositories/AuthRepositoryImpl";
-import { LoginCredentials } from "@/core/data/dtos/LoginDTO";
-
-const authRepo = new AuthRepositoryImpl();
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { login } from "@/store/slices/authSlice";
+import type { LoginCredentials } from "@/store/types";
 
 export default function LoginPage() {
   const router = useRouter();
+  const dispatch = useAppDispatch();
+  const { isLoading } = useAppSelector((state) => state.auth);
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
 
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<LoginCredentials>();
 
   const onSubmit = async (data: LoginCredentials) => {
     setLoginError(null);
-    try {
-      await authRepo.login(data);
+    const result = await dispatch(login(data));
+    if (login.fulfilled.match(result)) {
       router.push("/dashboard/projects");
-    } catch (error) {
-      setLoginError("Credenciales inválidas. Por favor intenta de nuevo.");
+    } else {
+      setLoginError(result.payload as string || "Credenciales inválidas. Por favor intenta de nuevo.");
     }
   };
 
@@ -136,10 +137,10 @@ export default function LoginPage() {
           {/* Botón Principal - Gradiente Naranja */}
           <button
             type='submit'
-            disabled={isSubmitting}
+            disabled={isLoading}
             className='w-full bg-gradient-to-r from-[#FF5500] to-[#CC4400] text-white font-bold py-4 rounded-2xl shadow-lg shadow-orange-950/20 hover:shadow-orange-700/20 transform hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2 uppercase tracking-wider text-sm disabled:opacity-50'
           >
-            {isSubmitting ? (
+            {isLoading ? (
               <Loader2 className='animate-spin' />
             ) : (
               <>
