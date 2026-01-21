@@ -2,7 +2,7 @@
 
 import React, { useCallback, useState } from "react";
 import { Upload, X, Image as ImageIcon, Loader2 } from "lucide-react";
-import { apiRequest } from "@/store/api";
+import { apiRequest } from "@/lib/axios";
 
 interface ImageUploadProps {
   projectId: string;
