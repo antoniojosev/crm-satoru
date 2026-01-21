@@ -370,7 +370,9 @@ export default function InvestorDetailPage({
                       className='w-full h-full object-contain'
                       onError={(e) => {
                         console.error('Error loading documentFront:', getImageUrl(investor.kycData!.documentFrontUrl));
-                        e.currentTarget.src = '/placeholder.png';
+                        // Use a data URI to prevent infinite loop
+                        e.currentTarget.onerror = null; // Prevent infinite loop
+                        e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="300"%3E%3Crect fill="%23333" width="400" height="300"/%3E%3Ctext fill="%23999" font-family="Arial" font-size="16" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EImagen no disponible%3C/text%3E%3C/svg%3E';
                       }}
                     />
                     <a
@@ -398,7 +400,8 @@ export default function InvestorDetailPage({
                       className='w-full h-full object-contain'
                       onError={(e) => {
                         console.error('Error loading documentBack:', getImageUrl(investor.kycData!.documentBackUrl));
-                        e.currentTarget.src = '/placeholder.png';
+                        e.currentTarget.onerror = null; // Prevent infinite loop
+                        e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="300"%3E%3Crect fill="%23333" width="400" height="300"/%3E%3Ctext fill="%23999" font-family="Arial" font-size="16" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EImagen no disponible%3C/text%3E%3C/svg%3E';
                       }}
                     />
                     <a
@@ -426,7 +429,8 @@ export default function InvestorDetailPage({
                       className='w-full h-full object-contain'
                       onError={(e) => {
                         console.error('Error loading selfie:', getImageUrl(investor.kycData!.selfieUrl));
-                        e.currentTarget.src = '/placeholder.png';
+                        e.currentTarget.onerror = null; // Prevent infinite loop
+                        e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="300"%3E%3Crect fill="%23333" width="400" height="300"/%3E%3Ctext fill="%23999" font-family="Arial" font-size="16" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EImagen no disponible%3C/text%3E%3C/svg%3E';
                       }}
                     />
                     <a
