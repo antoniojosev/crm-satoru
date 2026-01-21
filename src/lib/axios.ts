@@ -88,10 +88,18 @@ export async function apiRequest<T>(
   method: "get" | "post" | "put" | "patch" | "delete",
   url: string,
   data?: unknown,
-  config?: object
+  config?: unknown
 ): Promise<T> {
   try {
-    const response = await satoruApi[method](url, data, config);
+    let response;
+
+    // GET and DELETE don't accept a body parameter
+    if (method === "get" || method === "delete") {
+      response = await satoruApi[method](url, config as any);
+    } else {
+      // POST, PUT, PATCH accept body
+      response = await satoruApi[method](url, data, config as any);
+    }
 
     // Handle wrapped response format from backend
     if (
