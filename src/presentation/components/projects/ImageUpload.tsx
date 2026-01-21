@@ -41,6 +41,8 @@ export default function ImageUpload({
 
       try {
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
+        console.log('Uploading image to:', `${apiUrl}/projects/${projectId}/images/upload`);
+
         const response = await fetch(
           `${apiUrl}/projects/${projectId}/images/upload`,
           {
@@ -53,11 +55,21 @@ export default function ImageUpload({
         );
 
         if (!response.ok) {
+          const errorText = await response.text();
+          console.error('Upload response error:', errorText);
           throw new Error("Error al subir la imagen");
         }
 
         const project = await response.json();
-        onImagesChange(project.images || []);
+        console.log('Upload response:', project);
+        console.log('Updated images after upload:', project.images);
+
+        if (project.images && Array.isArray(project.images)) {
+          onImagesChange(project.images);
+        } else {
+          console.error('Invalid response format, images not found:', project);
+          throw new Error("Formato de respuesta inválido");
+        }
       } catch (error) {
         console.error(`Error uploading image ${i + 1}:`, error);
         setUploadError(`Error al subir ${file.name}. Continuando con las demás...`);
@@ -71,8 +83,25 @@ export default function ImageUpload({
   };
 
   const deleteImage = async (imageUrl: string) => {
-    const filename = imageUrl.split("/").pop();
-    if (!filename) return;
+    // Extract filename from URL - handle both relative and absolute URLs
+    let filename = imageUrl;
+
+    // If it's a full URL, extract just the filename
+    if (imageUrl.startsWith('http')) {
+      const urlParts = imageUrl.split('/');
+      filename = urlParts[urlParts.length - 1];
+    } else {
+      // It's a relative URL like /uploads/projects/filename.jpg
+      filename = imageUrl.split("/").pop() || '';
+    }
+
+    if (!filename) {
+      console.error('Could not extract filename from:', imageUrl);
+      setUploadError("Error: no se pudo determinar el nombre del archivo");
+      return;
+    }
+
+    console.log('Deleting image:', { imageUrl, filename });
 
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
@@ -87,10 +116,14 @@ export default function ImageUpload({
       );
 
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Delete response error:', errorText);
         throw new Error("Error al eliminar la imagen");
       }
 
       const project = await response.json();
+      console.log('Delete response:', project);
+      console.log('Updated images:', project.images);
       onImagesChange(project.images || []);
     } catch (error) {
       console.error("Error deleting image:", error);
@@ -193,13 +226,17 @@ export default function ImageUpload({
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {images.map((imageUrl, index) => (
             <div
-              key={index}
+              key={imageUrl}
               className="relative group aspect-square rounded-xl overflow-hidden bg-[#0A0A0A] border border-gray-800"
             >
               <img
                 src={getImageUrl(imageUrl)}
                 alt={`Imagen ${index + 1}`}
                 className="w-full h-full object-cover"
+                onError={(e) => {
+                  console.error('Error loading image:', imageUrl);
+                  console.error('Full URL:', getImageUrl(imageUrl));
+                }}
               />
               <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                 <button
