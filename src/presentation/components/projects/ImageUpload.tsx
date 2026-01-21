@@ -60,11 +60,17 @@ export default function ImageUpload({
           throw new Error("Error al subir la imagen");
         }
 
-        const project = await response.json();
-        console.log('Upload response:', project);
+        const data = await response.json();
+        console.log('Upload response raw data:', data);
+
+        // Handle both wrapped and unwrapped responses
+        const project = data.data || data;
+        console.log('Upload response project:', project);
         console.log('Updated images after upload:', project.images);
+        console.log('Images is array?', Array.isArray(project.images));
 
         if (project.images && Array.isArray(project.images)) {
+          console.log('Calling onImagesChange with:', project.images);
           onImagesChange(project.images);
         } else {
           console.error('Invalid response format, images not found:', project);
@@ -121,10 +127,22 @@ export default function ImageUpload({
         throw new Error("Error al eliminar la imagen");
       }
 
-      const project = await response.json();
-      console.log('Delete response:', project);
-      console.log('Updated images:', project.images);
-      onImagesChange(project.images || []);
+      const data = await response.json();
+      console.log('Delete response raw data:', data);
+
+      // Handle both wrapped and unwrapped responses
+      const project = data.data || data;
+      console.log('Delete response project:', project);
+      console.log('Updated images array:', project.images);
+      console.log('Images is array?', Array.isArray(project.images));
+
+      if (project.images && Array.isArray(project.images)) {
+        console.log('Calling onImagesChange with:', project.images);
+        onImagesChange(project.images);
+      } else {
+        console.error('Invalid or missing images array in response:', project);
+        setUploadError("Error: respuesta inválida del servidor");
+      }
     } catch (error) {
       console.error("Error deleting image:", error);
       setUploadError("Error al eliminar la imagen");
