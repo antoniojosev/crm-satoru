@@ -25,6 +25,10 @@ const statusConfig: Record<ProjectStatus, { label: string; classes: string }> = 
     label: "Cancelado",
     classes: "bg-red-500/10 text-red-500 border-red-500/20",
   },
+  BLOCKCHAIN_ERROR: {
+    label: "Error blockchain",
+    classes: "bg-orange-500/10 text-orange-400 border-orange-500/20",
+  },
 };
 
 export default function ProjectStatusBadge({ status }: ProjectStatusBadgeProps) {

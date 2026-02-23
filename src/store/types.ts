@@ -33,7 +33,7 @@ export interface AuthResponse {
 }
 
 // Project types
-export type ProjectStatus = "DRAFT" | "FUNDING" | "ACTIVE" | "COMPLETED" | "CANCELLED";
+export type ProjectStatus = "DRAFT" | "FUNDING" | "ACTIVE" | "COMPLETED" | "CANCELLED" | "BLOCKCHAIN_ERROR";
 
 export interface Project {
   id: string;

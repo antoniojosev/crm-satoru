@@ -17,6 +17,7 @@ const allowedTransitions: Record<ProjectStatus, ProjectStatus[]> = {
   ACTIVE: ["COMPLETED", "CANCELLED"],
   COMPLETED: [],
   CANCELLED: [],
+  BLOCKCHAIN_ERROR: ["CANCELLED"],
 };
 
 export default function ProjectStatusDropdown({

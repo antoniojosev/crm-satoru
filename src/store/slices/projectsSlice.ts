@@ -60,7 +60,8 @@ export const createProject = createAsyncThunk<Project, CreateProjectDto>(
   "projects/createProject",
   async (data, { rejectWithValue }) => {
     try {
-      return await apiRequest<Project>("post", "/projects", data);
+      // Timeout extendido: el backend espera la confirmación de la TX en Polygon Amoy (~30-60s)
+      return await apiRequest<Project>("post", "/projects", data, { timeout: 120000 });
     } catch (error: unknown) {
       const err = error as { response?: { data?: { message?: string } }; message?: string };
       return rejectWithValue(err.response?.data?.message || "Error al crear proyecto");

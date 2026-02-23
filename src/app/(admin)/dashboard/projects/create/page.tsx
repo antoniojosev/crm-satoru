@@ -523,7 +523,7 @@ export default function CreateProjectPage() {
             {isLoading || uploadingImages ? (
               <>
                 <Loader2 className="animate-spin" size={18} />
-                {uploadingImages ? "Subiendo imágenes..." : "Creando proyecto..."}
+                {uploadingImages ? "Subiendo imágenes..." : "Desplegando en blockchain..."}
               </>
             ) : (
               <>
