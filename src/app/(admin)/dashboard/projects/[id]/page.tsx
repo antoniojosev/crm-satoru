@@ -14,14 +14,27 @@ import {
   ExternalLink,
   Loader2,
   X,
+  Banknote,
+  CheckCircle2,
+  Clock,
+  XCircle,
+  Users,
 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
   fetchProjectById,
   clearCurrentProject,
 } from "@/store/slices/projectsSlice";
+import { fetchLiquidaciones } from "@/store/slices/liquidacionesSlice";
+import type { LiquidacionStatus } from "@/store/slices/liquidacionesSlice";
 import ProjectStatusBadge from "@/presentation/components/projects/ProjectStatusBadge";
 import { getImageUrl } from "@/lib/image-url";
+
+const STATUS_CONFIG: Record<LiquidacionStatus, { label: string; icon: React.ReactNode; className: string }> = {
+  PENDING: { label: "Pendiente", icon: <Clock size={11} />, className: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20" },
+  DISTRIBUTED: { label: "Distribuido", icon: <CheckCircle2 size={11} />, className: "bg-green-500/10 text-green-400 border-green-500/20" },
+  FAILED: { label: "Fallido", icon: <XCircle size={11} />, className: "bg-red-500/10 text-red-400 border-red-500/20" },
+};
 
 export default function ProjectDetailPage({
   params,
@@ -35,10 +48,17 @@ export default function ProjectDetailPage({
     isLoading,
     error,
   } = useAppSelector((state) => state.projects);
+  const { liquidaciones } = useAppSelector((state) => state.liquidaciones);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+  const projectLiquidaciones = liquidaciones.filter((l) => l.projectId === id);
+  const totalDistribuido = projectLiquidaciones
+    .filter((l) => l.status === "DISTRIBUTED")
+    .reduce((sum, l) => sum + Number(l.yieldAmount), 0);
 
   useEffect(() => {
     dispatch(fetchProjectById(id));
+    dispatch(fetchLiquidaciones(id));
     return () => {
       dispatch(clearCurrentProject());
     };
@@ -350,6 +370,80 @@ export default function ProjectDetailPage({
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Resumen Financiero — Liquidaciones del proyecto */}
+      <div className="bg-[#1A1A1A] border border-gray-800 rounded-2xl overflow-hidden">
+        <div className="p-5 border-b border-gray-800 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Banknote size={16} className="text-[#FF4400]" />
+            <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest">
+              Historial de Liquidaciones
+            </h3>
+          </div>
+          <div className="flex items-center gap-4">
+            <span className="text-xs text-gray-500">
+              Total distribuido:{" "}
+              <span className="text-green-400 font-bold">
+                ${totalDistribuido.toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT
+              </span>
+            </span>
+            <Link
+              href={`/dashboard/liquidaciones/create?projectId=${id}`}
+              className="bg-[#FF4400] hover:bg-[#CC3300] text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
+            >
+              + Nueva
+            </Link>
+          </div>
+        </div>
+
+        {projectLiquidaciones.length === 0 ? (
+          <div className="p-10 text-center">
+            <Banknote className="mx-auto text-gray-700 mb-3" size={36} />
+            <p className="text-gray-500 text-sm">No hay liquidaciones para este proyecto.</p>
+          </div>
+        ) : (
+          <table className="w-full text-left">
+            <thead>
+              <tr className="bg-gray-900/40">
+                <th className="p-3 text-xs text-gray-600 uppercase font-bold">Fecha</th>
+                <th className="p-3 text-xs text-gray-600 uppercase font-bold text-right">Ventas Totales</th>
+                <th className="p-3 text-xs text-gray-600 uppercase font-bold text-right">Rendimiento</th>
+                <th className="p-3 text-xs text-gray-600 uppercase font-bold text-center">Inversores</th>
+                <th className="p-3 text-xs text-gray-600 uppercase font-bold text-center">Estado</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-800/50">
+              {projectLiquidaciones.map((liq) => {
+                const cfg = STATUS_CONFIG[liq.status];
+                return (
+                  <tr key={liq.id} className="hover:bg-white/5 transition-colors">
+                    <td className="p-3 text-gray-500 text-xs">
+                      {new Date(liq.createdAt).toLocaleDateString("es-AR")}
+                    </td>
+                    <td className="p-3 text-right text-white text-sm font-medium">
+                      ${Number(liq.totalSalesAmount).toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </td>
+                    <td className="p-3 text-right text-green-400 font-bold text-sm">
+                      ${Number(liq.yieldAmount).toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </td>
+                    <td className="p-3 text-center">
+                      <div className="flex items-center justify-center gap-1 text-gray-400 text-sm">
+                        <Users size={13} />
+                        {liq.distributedTo}
+                      </div>
+                    </td>
+                    <td className="p-3 text-center">
+                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold border ${cfg.className}`}>
+                        {cfg.icon}{cfg.label}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        )}
       </div>
 
       {/* Lightbox para imagen seleccionada */}

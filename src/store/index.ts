@@ -3,6 +3,7 @@ import authReducer from "./slices/authSlice";
 import projectsReducer from "./slices/projectsSlice";
 import investorsReducer from "./slices/investorsSlice";
 import dashboardReducer from "./slices/dashboardSlice";
+import liquidacionesReducer from "./slices/liquidacionesSlice";
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
     projects: projectsReducer,
     investors: investorsReducer,
     dashboard: dashboardReducer,
+    liquidaciones: liquidacionesReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

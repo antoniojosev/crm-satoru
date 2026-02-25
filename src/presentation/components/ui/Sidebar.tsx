@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Building2, Users, LogOut } from "lucide-react";
+import { LayoutDashboard, Building2, Users, LogOut, Banknote } from "lucide-react";
 
 interface SidebarProps {
   onLogout?: () => void;
@@ -15,6 +15,7 @@ export default function Sidebar({ onLogout }: SidebarProps) {
     { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
     { name: "Proyectos", path: "/dashboard/projects", icon: Building2 },
     { name: "Inversores", path: "/dashboard/investors", icon: Users },
+    { name: "Liquidaciones", path: "/dashboard/liquidaciones", icon: Banknote },
   ];
 
   return (

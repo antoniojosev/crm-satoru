@@ -20,6 +20,11 @@ import {
   ShieldCheck,
   ShieldAlert,
   Clock,
+  TrendingUp,
+  Banknote,
+  ArrowDownLeft,
+  ArrowUpRight,
+  ExternalLink,
 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
@@ -29,6 +34,26 @@ import {
 } from "@/store/slices/investorsSlice";
 import type { KycStatus } from "@/store/types";
 import { getImageUrl } from "@/lib/image-url";
+
+interface InvestorSummary {
+  totalInvested: number;
+  totalEarned: number;
+  investments: {
+    id: string;
+    projectName: string;
+    amountPaid: number;
+    tokenAmount: number;
+    txHash: string | null;
+    createdAt: string;
+  }[];
+  distributions: {
+    id: string;
+    projectName: string;
+    amount: number;
+    txHash: string | null;
+    createdAt: string;
+  }[];
+}
 
 export default function InvestorDetailPage({
   params,
@@ -43,9 +68,19 @@ export default function InvestorDetailPage({
   );
 
   const [isProcessing, setIsProcessing] = useState(false);
+  const [summary, setSummary] = useState<InvestorSummary | null>(null);
 
   useEffect(() => {
     dispatch(fetchInvestorById(id));
+
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api/v1";
+    const token = localStorage.getItem("satoru_admin_token");
+    fetch(`${apiUrl}/investors/${id}/summary`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((r) => r.json())
+      .then((json) => setSummary(json.data ?? json))
+      .catch(() => {});
 
     return () => {
       dispatch(clearCurrentInvestor());
@@ -448,6 +483,147 @@ export default function InvestorDetailPage({
           )}
         </div>
       </div>
+
+      {/* Actividad Financiera */}
+      {summary && (
+        <div className="space-y-6">
+          {/* Totales */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="bg-[#1A1A1A] border border-gray-800 rounded-2xl p-6 flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-[#FF4400]/10 border border-[#FF4400]/20 flex items-center justify-center">
+                <ArrowUpRight size={22} className="text-[#FF4400]" />
+              </div>
+              <div>
+                <p className="text-gray-500 text-xs uppercase font-bold mb-1">Total Invertido</p>
+                <p className="text-white font-bold text-2xl">
+                  ${summary.totalInvested.toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  <span className="text-gray-500 text-sm font-normal ml-1">USDT</span>
+                </p>
+              </div>
+            </div>
+            <div className="bg-[#1A1A1A] border border-gray-800 rounded-2xl p-6 flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-green-500/10 border border-green-500/20 flex items-center justify-center">
+                <TrendingUp size={22} className="text-green-400" />
+              </div>
+              <div>
+                <p className="text-gray-500 text-xs uppercase font-bold mb-1">Total Ganado</p>
+                <p className="text-green-400 font-bold text-2xl">
+                  ${summary.totalEarned.toLocaleString("es-AR", { minimumFractionDigits: 6, maximumFractionDigits: 6 })}
+                  <span className="text-gray-500 text-sm font-normal ml-1">USDT</span>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Inversiones confirmadas */}
+          <div className="bg-[#1A1A1A] border border-gray-800 rounded-2xl overflow-hidden">
+            <div className="p-5 border-b border-gray-800 flex items-center gap-2">
+              <ArrowUpRight size={16} className="text-[#FF4400]" />
+              <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest">
+                Inversiones ({summary.investments.length})
+              </h3>
+            </div>
+            {summary.investments.length === 0 ? (
+              <p className="p-6 text-gray-600 text-sm text-center">Sin inversiones confirmadas</p>
+            ) : (
+              <table className="w-full text-left">
+                <thead>
+                  <tr className="bg-gray-900/40">
+                    <th className="p-3 text-xs text-gray-600 uppercase font-bold">Proyecto</th>
+                    <th className="p-3 text-xs text-gray-600 uppercase font-bold text-right">Monto</th>
+                    <th className="p-3 text-xs text-gray-600 uppercase font-bold text-right">Tokens</th>
+                    <th className="p-3 text-xs text-gray-600 uppercase font-bold">Fecha</th>
+                    <th className="p-3 text-xs text-gray-600 uppercase font-bold">Tx</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-800/50">
+                  {summary.investments.map((inv) => (
+                    <tr key={inv.id} className="hover:bg-white/5 transition-colors">
+                      <td className="p-3 text-white text-sm font-medium">{inv.projectName}</td>
+                      <td className="p-3 text-right text-[#FF4400] font-bold text-sm">
+                        ${inv.amountPaid.toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </td>
+                      <td className="p-3 text-right text-gray-400 text-sm">
+                        {inv.tokenAmount.toLocaleString("es-AR", { maximumFractionDigits: 2 })}
+                      </td>
+                      <td className="p-3 text-gray-500 text-xs">
+                        {new Date(inv.createdAt).toLocaleDateString("es-AR")}
+                      </td>
+                      <td className="p-3">
+                        {inv.txHash ? (
+                          <a
+                            href={`https://amoy.polygonscan.com/tx/${inv.txHash}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-gray-600 hover:text-[#FF4400] transition-colors"
+                          >
+                            <ExternalLink size={14} />
+                          </a>
+                        ) : (
+                          <span className="text-gray-700">—</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+
+          {/* Rendimientos recibidos */}
+          <div className="bg-[#1A1A1A] border border-gray-800 rounded-2xl overflow-hidden">
+            <div className="p-5 border-b border-gray-800 flex items-center gap-2">
+              <ArrowDownLeft size={16} className="text-green-400" />
+              <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest">
+                Rendimientos Recibidos ({summary.distributions.length})
+              </h3>
+            </div>
+            {summary.distributions.length === 0 ? (
+              <p className="p-6 text-gray-600 text-sm text-center">
+                Aún no recibió rendimientos — se acreditarán en la próxima liquidación.
+              </p>
+            ) : (
+              <table className="w-full text-left">
+                <thead>
+                  <tr className="bg-gray-900/40">
+                    <th className="p-3 text-xs text-gray-600 uppercase font-bold">Proyecto</th>
+                    <th className="p-3 text-xs text-gray-600 uppercase font-bold text-right">Monto USDT</th>
+                    <th className="p-3 text-xs text-gray-600 uppercase font-bold">Fecha</th>
+                    <th className="p-3 text-xs text-gray-600 uppercase font-bold">Tx</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-800/50">
+                  {summary.distributions.map((d) => (
+                    <tr key={d.id} className="hover:bg-white/5 transition-colors">
+                      <td className="p-3 text-white text-sm font-medium">{d.projectName}</td>
+                      <td className="p-3 text-right text-green-400 font-bold text-sm">
+                        +${d.amount.toLocaleString("es-AR", { minimumFractionDigits: 6, maximumFractionDigits: 6 })}
+                      </td>
+                      <td className="p-3 text-gray-500 text-xs">
+                        {new Date(d.createdAt).toLocaleDateString("es-AR")}
+                      </td>
+                      <td className="p-3">
+                        {d.txHash ? (
+                          <a
+                            href={`https://amoy.polygonscan.com/tx/${d.txHash}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-gray-600 hover:text-green-400 transition-colors"
+                          >
+                            <ExternalLink size={14} />
+                          </a>
+                        ) : (
+                          <span className="text-gray-700">—</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
