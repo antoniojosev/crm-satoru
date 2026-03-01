@@ -496,7 +496,7 @@ export default function InvestorDetailPage({
               <div>
                 <p className="text-gray-500 text-xs uppercase font-bold mb-1">Total Invertido</p>
                 <p className="text-white font-bold text-2xl">
-                  ${summary.totalInvested.toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  ${(summary.totalInvested || 0).toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   <span className="text-gray-500 text-sm font-normal ml-1">USDT</span>
                 </p>
               </div>
@@ -508,7 +508,7 @@ export default function InvestorDetailPage({
               <div>
                 <p className="text-gray-500 text-xs uppercase font-bold mb-1">Total Ganado</p>
                 <p className="text-green-400 font-bold text-2xl">
-                  ${summary.totalEarned.toLocaleString("es-AR", { minimumFractionDigits: 6, maximumFractionDigits: 6 })}
+                  ${(summary.totalEarned || 0).toLocaleString("es-AR", { minimumFractionDigits: 6, maximumFractionDigits: 6 })}
                   <span className="text-gray-500 text-sm font-normal ml-1">USDT</span>
                 </p>
               </div>
@@ -541,10 +541,10 @@ export default function InvestorDetailPage({
                     <tr key={inv.id} className="hover:bg-white/5 transition-colors">
                       <td className="p-3 text-white text-sm font-medium">{inv.projectName}</td>
                       <td className="p-3 text-right text-[#FF4400] font-bold text-sm">
-                        ${inv.amountPaid.toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        ${(inv.amountPaid || 0).toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </td>
                       <td className="p-3 text-right text-gray-400 text-sm">
-                        {inv.tokenAmount.toLocaleString("es-AR", { maximumFractionDigits: 2 })}
+                        {(inv.tokenAmount || 0).toLocaleString("es-AR", { maximumFractionDigits: 2 })}
                       </td>
                       <td className="p-3 text-gray-500 text-xs">
                         {new Date(inv.createdAt).toLocaleDateString("es-AR")}
@@ -597,7 +597,7 @@ export default function InvestorDetailPage({
                     <tr key={d.id} className="hover:bg-white/5 transition-colors">
                       <td className="p-3 text-white text-sm font-medium">{d.projectName}</td>
                       <td className="p-3 text-right text-green-400 font-bold text-sm">
-                        +${d.amount.toLocaleString("es-AR", { minimumFractionDigits: 6, maximumFractionDigits: 6 })}
+                        +${(d.amount || 0).toLocaleString("es-AR", { minimumFractionDigits: 6, maximumFractionDigits: 6 })}
                       </td>
                       <td className="p-3 text-gray-500 text-xs">
                         {new Date(d.createdAt).toLocaleDateString("es-AR")}

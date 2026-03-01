@@ -2,7 +2,7 @@
 
 import React, { useEffect } from "react";
 import Link from "next/link";
-import { Plus, Loader2, CheckCircle2, Clock, XCircle, Banknote, Users } from "lucide-react";
+import { Plus, Loader2, CheckCircle2, Clock, XCircle, Banknote, Users, Eye } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { fetchLiquidaciones } from "@/store/slices/liquidacionesSlice";
 import type { LiquidacionStatus } from "@/store/slices/liquidacionesSlice";
@@ -102,6 +102,9 @@ export default function LiquidacionesPage() {
                 <th className="p-4 text-xs font-bold text-gray-500 uppercase tracking-widest">
                   Fecha
                 </th>
+                <th className="p-4 text-xs font-bold text-gray-500 uppercase tracking-widest text-center">
+                  Acciones
+                </th>
               </tr>
             </thead>
 
@@ -162,6 +165,17 @@ export default function LiquidacionesPage() {
                       <span className="text-gray-500 text-xs">
                         {formatDate(liq.createdAt)}
                       </span>
+                    </td>
+
+                    {/* Acciones */}
+                    <td className="p-4 text-center">
+                      <Link
+                        href={`/dashboard/liquidaciones/${liq.id}`}
+                        className="inline-flex items-center justify-center p-2 text-gray-400 hover:text-[#FF4400] hover:bg-[#FF4400]/10 rounded-lg transition-all"
+                        title="Ver Detalle"
+                      >
+                        <Eye size={18} />
+                      </Link>
                     </td>
                   </tr>
                 );
