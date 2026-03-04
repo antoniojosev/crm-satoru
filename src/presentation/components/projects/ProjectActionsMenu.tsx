@@ -38,7 +38,7 @@ export default function ProjectActionsMenu({
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 z-50 mt-2 w-48 bg-[#1A1A1A] border border-gray-800 rounded-xl shadow-xl overflow-hidden">
+        <div className="absolute right-0 z-50 bottom-full mb-2 w-48 bg-[#1A1A1A] border border-gray-800 rounded-xl shadow-xl overflow-hidden">
           <Link
             href={`/dashboard/projects/${projectId}`}
             className="w-full px-4 py-3 text-left text-sm text-gray-300 hover:bg-gray-800 hover:text-white transition-colors flex items-center gap-3"

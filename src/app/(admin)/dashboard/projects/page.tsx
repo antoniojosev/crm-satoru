@@ -36,7 +36,7 @@ export default function ProjectsPage() {
   const [projectToDelete, setProjectToDelete] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const isSuperAdmin = user?.role === "SUPER_ADMIN";
+  const canManage = user?.role === "SUPER_ADMIN" || user?.role === "ADMIN";
 
   useEffect(() => {
     dispatch(fetchProjects(filters.status ?? undefined));
@@ -148,7 +148,7 @@ export default function ProjectsPage() {
         </div>
       ) : (
         /* Tabla de Proyectos */
-        <div className="bg-[#1A1A1A] border border-gray-800 rounded-2xl overflow-hidden">
+        <div className="bg-[#1A1A1A] border border-gray-800 rounded-2xl overflow-visible">
           <table className="w-full text-left">
             <thead>
               <tr className="border-b border-gray-800 bg-gray-900/50">
@@ -237,7 +237,7 @@ export default function ProjectsPage() {
                       <ProjectActionsMenu
                         projectId={project.id}
                         onDelete={() => handleDeleteClick(project.id)}
-                        canDelete={isSuperAdmin}
+                      canDelete={canManage}
                       />
                     </td>
                   </tr>

@@ -55,7 +55,7 @@ export default function ProjectStatusDropdown({
       </button>
 
       {isOpen && (
-        <div className="absolute z-50 mt-2 w-40 bg-[#1A1A1A] border border-gray-800 rounded-xl shadow-xl overflow-hidden">
+        <div className="absolute z-50 bottom-full mb-2 w-40 bg-[#1A1A1A] border border-gray-800 rounded-xl shadow-xl overflow-hidden">
           {availableStatuses.map((status) => (
             <button
               key={status}
